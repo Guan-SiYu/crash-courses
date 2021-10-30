@@ -1,23 +1,22 @@
 import React from "react";
-import { getMovies } from "../services/fakeMovieService";
-const initMovieList = getMovies();
+import Like from "./Like";
 class Movies extends React.Component {
-    state = {
-        movieList: initMovieList,
-    };
-    handleDelete = (movie) => {
-        const filtered_movieList = this.state.movieList.filter(
-            (item) => item._id !== movie._id
-        );
-        this.setState({ movieList: filtered_movieList });
-    };
     render() {
-        const movieCount = this.state.movieList.length;
+        const { tableData, onLike, onDelete, pagination } = this.props;
+
+        // filtering:
+        // paginating:
+        const { pageIdx, perPageSize } = pagination;
+        const pagedMovieList = tableData.slice(
+            pageIdx * perPageSize,
+            pageIdx * perPageSize + perPageSize
+        );
+
         return (
             <React.Fragment>
                 <p>
-                    {movieCount
-                        ? `Showing ${movieCount} movies in the database`
+                    {tableData.length
+                        ? `Showing ${tableData.length} movies in the database`
                         : `There are no movies in the database`}
                 </p>
 
@@ -33,7 +32,7 @@ class Movies extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.movieList.map((item, idx) => (
+                        {pagedMovieList.map((item, idx) => (
                             <tr key={idx}>
                                 <th scope="row">{idx}</th>
                                 <td>{item.title}</td>
@@ -41,10 +40,16 @@ class Movies extends React.Component {
                                 <td>{item.numberInStock}</td>
                                 <td>{item.dailyRentalRate}</td>
                                 <td>
+                                    <Like
+                                        isLiked={item.isLiked}
+                                        onLike={onLike(item)}
+                                    />
+                                </td>
+                                <td>
                                     <button
                                         type="button"
                                         className="btn btn-danger"
-                                        onClick={() => this.handleDelete(item)}
+                                        onClick={() => onDelete(item)}
                                     >
                                         Delete
                                     </button>
