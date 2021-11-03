@@ -1,16 +1,19 @@
 import React from "react";
 import Like from "./Like";
+import { Link } from "react-router-dom";
 class Movies extends React.Component {
+    raiseSort = (path) => {
+        const sortConfig = { ...this.props.sortConfig };
+        if (sortConfig.path === path) {
+            sortConfig.order = sortConfig.order === "asc" ? "desc" : "asc";
+        } else {
+            sortConfig.path = path;
+            sortConfig.order = "asc";
+        }
+        this.props.onSort(sortConfig);
+    };
     render() {
-        const { tableData, onLike, onDelete, pagination } = this.props;
-
-        // filtering:
-        // paginating:
-        const { pageIdx, perPageSize } = pagination;
-        const pagedMovieList = tableData.slice(
-            pageIdx * perPageSize,
-            pageIdx * perPageSize + perPageSize
-        );
+        const { tableData, onLike, onDelete } = this.props;
 
         return (
             <React.Fragment>
@@ -24,18 +27,44 @@ class Movies extends React.Component {
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Genre</th>
-                            <th scope="col">Stock</th>
-                            <th scope="col">Rate</th>
+                            <th
+                                scope="col"
+                                onClick={() => this.raiseSort("title")}
+                            >
+                                Title
+                            </th>
+                            <th
+                                scope="col"
+                                onClick={() => this.raiseSort("genre.name")}
+                            >
+                                Genre
+                            </th>
+                            <th
+                                scope="col"
+                                onClick={() => this.raiseSort("numberInStock")}
+                            >
+                                Stock
+                            </th>
+                            <th
+                                scope="col"
+                                onClick={() =>
+                                    this.raiseSort("dailyRentalRate")
+                                }
+                            >
+                                Rate
+                            </th>
                             <th scope="col">Operator</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {pagedMovieList.map((item, idx) => (
+                        {tableData.map((item, idx) => (
                             <tr key={idx}>
                                 <th scope="row">{idx}</th>
-                                <td>{item.title}</td>
+                                <td>
+                                    <Link to={`/movie/${item._id}`}>
+                                        {item.title}
+                                    </Link>
+                                </td>
                                 <td>{item.genre.name}</td>
                                 <td>{item.numberInStock}</td>
                                 <td>{item.dailyRentalRate}</td>
